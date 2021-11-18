@@ -1,0 +1,179 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Insert title here</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <!-- CDN  서비스-->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  
+</head>
+<body>
+
+<!--  ..  :상위폴더  . :현재폴더 -->
+
+<%- include('../common/header', {menu:'member', userinfo:userinfo} ); %>
+
+<div class="container mt-3">
+    <form name="form" id="form">
+        <input type="hidden" name="idcheckyn" id="idcheckyn" value="N">
+
+    <h1>회원가입</h1>
+
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="아이디" name="user_id" id="user_id">
+    <div class="input-group-append">
+      <button class="btn btn-success" type="button" onclick="goIDCheck()">중복체크</button>  
+     </div>
+  </div>
+
+  <div class="input-group mb-3">
+    <input type="password" class="form-control" name="password" id="password" placeholder="페스워드">
+  </div>
+
+  <div class="input-group mb-3">
+    <input type="password" class="form-control" name="password2" id="password2" placeholder="패스워드확인">
+  </div>
+
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="이름" name="username" id="username">
+  </div>
+
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="닉네임" name="nickname" id="nickname">
+  </div>
+
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="email" name="email" id="email">
+  </div>
+
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="전화번호" name="phone" id="phone">
+  </div>
+
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="우편번호" name="zipcode" id="zipcode">
+  </div>
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="도로주소" name="address1" id="address1">
+  </div>
+
+  <div class="input-group mb-3">
+    <input type="text" class="form-control" placeholder="상세주소" name="address2" id="address2">
+  </div>    
+  
+
+
+  <!-- 다음 우편 api :주소체계 번지 -> 길  -->
+  
+  	<div class="container" style="text-align:right">
+	 
+	  <div class="btn-group">
+	    
+       <button type="button" class="btn btn-primary" onclick="goWrite()">등록</button>&nbsp;&nbsp;
+      
+	    <button type="button" class="btn btn-primary" onclick="goCancel()">취소</button>&nbsp;&nbsp;
+	  </div>
+	</div>
+</form>	
+</div>
+
+</body>
+</html>
+
+<script>
+function goWrite()
+{
+	// var frm = document.form;
+    // frm.method="post";
+	// frm.action="/member/register";
+	// frm.submit();
+    //contentType: 'application/x-www-form-urlencoded; charset=UTF-8', 
+ 
+    var params = $("#form").serialize();
+    console.log(params);
+    
+    //서버로 보낼 정보를 JSON형태로 만들어서 보낸다 
+    // var params = {
+    //     user_id:$("#user_id").val(),
+    //     password:$("#password").val(), 
+    //     username:$("#username").val(), 
+    //     email:$("#email").val(), 
+    //     phone:$("#phone").val(), 
+    //     zipcode:$("#zipcode").val(), 
+    //     address1:$("#address1").val(), 
+    //     address2:$("#address2").val(),    
+    // };
+
+    $.ajax({
+        url:"/member/register",
+        data:params,
+        method:"POST",
+        dataType:"json"    //수신 데이터 타입, text, xml, json 선택 
+    })
+    .done((data)=>{
+         console.log(data);
+         if(data.result=="success")
+         {
+            alert("회원가입을 축하드립니다.");
+            location.href="/"; //페이지가 이동된다.    
+        }
+
+    })  //전송이 성공하면  done 파트 호출
+    .fail((jqXHR, status)=>{
+        console.log( jqXHR);
+        console.log( status);
+    });     //전송이 실패하면 faill 파트 호출된다. 
+
+}
+
+function goModify()
+{
+	var frm = document.form;
+	frm.action="/board/modify_save";
+	frm.submit();
+}
+
+function goCancel()
+{
+  var frm = document.form;
+	frm.action="/board/list";
+	frm.submit();
+}
+
+function goIDCheck()
+{
+    //jquery의  ajax는 쓸만하다. 자바스크립트 라이브러리 
+    $.ajax({
+        url:"/member/idcheck",
+        data:{user_id: $("#user_id").val()},
+        method:"POST",
+        dataType:"json"    //수신 데이터 타입, text, xml, json 선택 
+    })
+    .done((data)=>{
+         console.log(data);
+         if(data.result=="success")
+         {
+            alert("사용가능한 아이디입니다.");
+            $("#idcheckyn").val("Y");
+         }
+        else
+        {
+            alert("이미 사용중인 아이디 입니다.");
+            $("#user_id").val("");
+            $("#idcheckyn").val("N");
+        }
+
+    })  //전송이 성공하면  done 파트 호출
+    .fail((jqXHR, status)=>{
+        console.log( jqXHR);
+        console.log( status);
+    });     //전송이 실패하면 faill 파트 호출된다. 
+
+}
+
+</script>
